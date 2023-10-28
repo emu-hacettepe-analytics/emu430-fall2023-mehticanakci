@@ -5,7 +5,7 @@ sidebar: false
 
 # Education
 
--   B.S., Industrial Engineering, Hacettepe University, Turkey, 20xx - ongoing.
+-   B.S., Industrial Engineering, Hacettepe University, Turkey, 2019 - ongoing.
 
 # Work Experience
 
@@ -25,6 +25,6 @@ sidebar: false
 
 # Competencies
 
-R, Quarto, Git, Python
+R, Quarto, Git, java
 
 # Hobbies
