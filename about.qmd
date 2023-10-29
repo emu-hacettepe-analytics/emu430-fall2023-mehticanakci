@@ -17,7 +17,7 @@ sidebar: false
 
 # Competencies
 
-R, Quarto, Git, Java
+R, Quarto, Git, java
 
 # Hobbies
 
