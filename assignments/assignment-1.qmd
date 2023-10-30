@@ -4,12 +4,71 @@ title: "Assignment 1"
 
 # Assignment 1
 
-```{r}
-1 + 1
-```
-
-My first assignment has two parts.
+My first assignment has three parts.
 
 ## (a)
 
+Johnny Breen Model Migration: from Excel to R This video is about Johnny Breen's work experience that results crashing server while he tries to convert a Excel model to R project. Excel model is a statistical model and his company needs a simulation that calculate yearly loss by 99.9% confidence interval. %99.9 means event can happen once in 1000 years and simulation have to be run 10-15 million times. After his attempt the server crashes and as a conclude for this event, his recommendations are, first 'try to understand what excel model do and what are the functional requirement' second 'determine where my model starts and ends also determine the operations that are applied to initial data' third 'keep things simple'. https://www.rstudio.com/conference/2022/talks/model-migration-excel-to-r/
+
 ## (b)
+
+**Differences between R and java** 1: Declarations styles: in java when you declare a variable you need to declare its type explicitly but in R you don't need. For example: java declares a variable as:
+
+```{java}
+String name = "mehti";
+```
+
+R declare a variable as:
+
+```{r}
+name='mehti'
+```
+
+At first, declaration standards in java can seem detailed but in my opinion, declaring its type at the beginning can prevent confusion that can occur later
+
+2: Coding Styles: in java you have to finish code line with ';' but R has no necessity
+
+```{java}
+int a=5;
+
+```
+
+```{r}
+a=5
+```
+
+3:Index order: in java, index of first element of an array, list etc. is 0 but in R index of first element is 1 For instance;
+
+```{java}
+double [] array= [1.2, 9.6, 3.5] ;
+System.out.println(array[0]);
+1.2
+array=c(1.2,9.6,3.5)
+array[1]
+```
+
+## (c)
+
+```{r}
+library(dslabs)
+
+data('na_example')
+print(na_example)
+
+```
+
+```{r}
+number_of_na=sum(is.na(na_example))
+print(paste('number of NAs', number_of_na))
+```
+
+```{r}
+na_example_without_NA=ifelse(is.na(na_example),0,na_example)
+print(na_example_without_NA)
+
+```
+
+```{r}
+tot=sum (is.na(na_example_without_NA))
+print(paste('Number of NAs',tot))
+```
