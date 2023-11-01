@@ -22,3 +22,5 @@ R, Quarto, Git, java
 # Hobbies
 
 Football, Ski, A little bit of Aviation
+
+[Download my CV](/assets/mehti-cv.pdf)
