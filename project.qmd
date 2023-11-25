@@ -3,10 +3,12 @@ title: "Our Course Project"
 sidebar: false 
 ---
 
-I'm honored to be a member of the \[group name\] project team.
+I'm honored to be a member of the \[data_criminals\] project team.
 
-Below, you'll find a brief summary of our project. To access a detailed project description, please go to [https://\[your-project-url\]](#0){.uri}.
+Below, you'll find a brief summary of our project. To access a detailed project description, please go to <https://emu-hacettepe-analytics.github.io/emu430-fall2023-team-data_criminals/data.html>.
 
 **Summary**
 
-\[provide a biref summary of your project\]
+In our project you will find clues from Turkey's prisons about convicts and their educational level. We want to explore whether there is correlation between convicts educational level and convicts crime type. Also we want to explore convicts educational level since 1990s.
+
+"All our knowledge hast its origins in our perceptions ... In nature there is no effect without a cause ... Experience never errs; it is only your judgments that err by promising themselves effects such as are not caused by your experiments ... Science is the observation of things possible, whether present or past; prescience is the knowledge of things which may come to pass."― **Leonardo da Vinci**
