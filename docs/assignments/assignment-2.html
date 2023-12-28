@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>[Student/Group Full Name]’s Analytics Lab - Assignment 2</title>
+<title>Mehti’s Analytics Lab - Assignment 2</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -109,7 +109,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
     <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">[Student/Group Full Name]’s Analytics Lab</span>
+    <span class="navbar-title">Mehti’s Analytics Lab</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -234,12 +234,241 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="assignment-2" class="level1">
 <h1>Assignment 2</h1>
+<p>R codes for Turkish movies more then 2500 reviews from <a href="https://m.imdb.com" class="uri">https://m.imdb.com</a> is as follows. By using these codes you can get a data frame “Movies” with 5 variable “Title, Year, Duration, Rating, Votes” and 469 observations. For 1. and 2. part of assignment 2.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.3     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'rvest'
+
+The following object is masked from 'package:readr':
+
+    guess_encoding</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr) </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>url_after_2010<span class="ot">=</span><span class="st">"https://m.imdb.com/search/title/?title_type=feature&amp;release_date=2010-01-01,2023-12-31&amp;sort=moviemeter,asc&amp;num_votes=2500,&amp;country_of_origin=TR&amp;count=250"</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>url_before_2010<span class="ot">=</span><span class="st">"https://m.imdb.com/search/title/?title_type=feature&amp;release_date=,2009-12-31&amp;sort=moviemeter,asc&amp;num_votes=2500,&amp;country_of_origin=TR&amp;count=250"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>url_vec<span class="ot">=</span><span class="fu">c</span>(url_before_2010,url_after_2010)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>Title<span class="ot">=</span><span class="fu">c</span>()</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>Year<span class="ot">=</span><span class="fu">c</span>() </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>Duration<span class="ot">=</span><span class="fu">c</span>()</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>Rating<span class="ot">=</span><span class="fu">c</span>() </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>Votes<span class="ot">=</span><span class="fu">c</span>()</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>data_for_after_2010_html<span class="ot">=</span><span class="fu">read_html</span>(url_vec[<span class="dv">1</span>])</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>title_names <span class="ot">&lt;-</span> data_for_after_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.ipc-title__text'</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>title_names <span class="ot">&lt;-</span> <span class="fu">html_text</span>(title_names)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>title_names <span class="ot">&lt;-</span> <span class="fu">tail</span>(<span class="fu">head</span>(title_names,<span class="sc">-</span><span class="dv">1</span>),<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>title_names <span class="ot">&lt;-</span> <span class="fu">str_split</span>(title_names, <span class="st">" "</span>, <span class="at">n=</span><span class="dv">2</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>title_names <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">lapply</span>(title_names, <span class="cf">function</span>(x) {x[<span class="dv">2</span>]}))</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>title_rating<span class="ot">=</span>data_for_after_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.ratingGroup--imdb-rating'</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>title_rating<span class="ot">=</span><span class="fu">html_text</span>(title_rating)</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>title_rating<span class="ot">=</span><span class="fu">substr</span>(title_rating,<span class="dv">1</span>,<span class="dv">3</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>title_rating<span class="ot">=</span><span class="fu">as.numeric</span>(title_rating)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>title_year<span class="ot">=</span>data_for_after_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.dli-title-metadata-item:nth-child(1)'</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>title_year<span class="ot">=</span><span class="fu">html_text</span>(title_year)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>title_year<span class="ot">=</span><span class="fu">as.numeric</span>(title_year)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>Year<span class="ot">=</span>title_year</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>title_duration<span class="ot">=</span>data_for_after_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.dli-title-metadata-item:nth-child(2)'</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>title_duration<span class="ot">=</span><span class="fu">html_text</span>(title_duration)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>title_duration<span class="ot">=</span><span class="dv">60</span><span class="sc">*</span><span class="fu">as.numeric</span>(<span class="fu">substr</span>(title_duration,<span class="dv">1</span>,<span class="dv">1</span>))<span class="sc">+</span><span class="fu">ifelse</span>(<span class="fu">nchar</span>(title_duration)<span class="sc">&gt;</span><span class="dv">2</span>,<span class="fu">as.integer</span>(<span class="fu">substring</span>(title_duration,<span class="fu">nchar</span>(title_duration)<span class="sc">-</span><span class="dv">2</span>,<span class="fu">nchar</span>(title_duration)<span class="sc">-</span><span class="dv">1</span>)),<span class="dv">0</span>)</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>Duration<span class="ot">=</span>title_duration</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>title_votes<span class="ot">=</span>data_for_after_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.kRnqtn'</span>)</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>title_votes<span class="ot">=</span><span class="fu">html_text</span>(title_votes)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>title_votes<span class="ot">=</span><span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">"Votes"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> title_votes)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>title_votes<span class="ot">=</span><span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">","</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> title_votes)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>title_votes<span class="ot">=</span><span class="fu">as.numeric</span>(title_votes)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>data_for_before_2010_html<span class="ot">=</span><span class="fu">read_html</span>(url_vec[<span class="dv">2</span>])</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>title_names_2 <span class="ot">&lt;-</span> data_for_before_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.ipc-title__text'</span>)</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>title_names_2 <span class="ot">&lt;-</span> <span class="fu">html_text</span>(title_names_2)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>title_names_2 <span class="ot">&lt;-</span> <span class="fu">tail</span>(<span class="fu">head</span>(title_names_2,<span class="sc">-</span><span class="dv">1</span>),<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>title_names_2 <span class="ot">&lt;-</span> <span class="fu">str_split</span>(title_names_2, <span class="st">" "</span>, <span class="at">n=</span><span class="dv">2</span>)</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>title_names_2 <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">lapply</span>(title_names_2, <span class="cf">function</span>(x) {x[<span class="dv">2</span>]}))</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>Title<span class="ot">=</span><span class="fu">c</span>(title_names,title_names_2)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>title_rating_2<span class="ot">=</span>data_for_before_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.ratingGroup--imdb-rating'</span>)</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>title_rating_2<span class="ot">=</span><span class="fu">html_text</span>(title_rating_2)</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>title_rating_2<span class="ot">=</span><span class="fu">substr</span>(title_rating_2,<span class="dv">1</span>,<span class="dv">3</span>)</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>title_rating_2<span class="ot">=</span><span class="fu">as.numeric</span>(title_rating_2)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>Rating<span class="ot">=</span><span class="fu">c</span>(title_rating,title_rating_2)</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>title_year_2<span class="ot">=</span>data_for_before_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.dli-title-metadata-item:nth-child(1)'</span>)</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>title_year_2<span class="ot">=</span><span class="fu">html_text</span>(title_year_2)</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>title_year_2<span class="ot">=</span><span class="fu">as.numeric</span>(title_year_2)</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>Year<span class="ot">=</span><span class="fu">c</span>(title_year,title_year_2)</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>title_duration_2<span class="ot">=</span>data_for_before_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.dli-title-metadata-item:nth-child(2)'</span>)</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>title_duration_2<span class="ot">=</span><span class="fu">html_text</span>(title_duration_2)</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>title_duration_2<span class="ot">=</span><span class="dv">60</span><span class="sc">*</span><span class="fu">as.numeric</span>(<span class="fu">substr</span>(title_duration_2,<span class="dv">1</span>,<span class="dv">1</span>))<span class="sc">+</span><span class="fu">ifelse</span>(<span class="fu">nchar</span>(title_duration_2)<span class="sc">&gt;</span><span class="dv">2</span>,<span class="fu">as.integer</span>(<span class="fu">substring</span>(title_duration_2,<span class="fu">nchar</span>(title_duration_2)<span class="sc">-</span><span class="dv">2</span>,<span class="fu">nchar</span>(title_duration_2)<span class="sc">-</span><span class="dv">1</span>)),<span class="dv">0</span>)</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>Duration<span class="ot">=</span><span class="fu">c</span>(title_duration,title_duration_2)</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>title_votes_2<span class="ot">=</span>data_for_before_2010_html <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.kRnqtn'</span>)</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>title_votes_2<span class="ot">=</span><span class="fu">html_text</span>(title_votes_2)</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>title_votes_2<span class="ot">=</span><span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">"Votes"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> title_votes_2)</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>title_votes_2<span class="ot">=</span><span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">","</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> title_votes_2)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>title_votes_2<span class="ot">=</span><span class="fu">as.numeric</span>(title_votes_2)</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>Votes<span class="ot">=</span><span class="fu">c</span>(title_votes,title_votes_2)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>Movies<span class="ot">=</span><span class="fu">data.frame</span>(Title,Year,Duration,Rating,Votes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Below you can see top and bottom 5 movies based on user ratings.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Movies<span class="sc">%&gt;%</span><span class="fu">arrange</span>(<span class="fu">desc</span>(Rating))<span class="sc">%&gt;%</span><span class="fu">head</span>(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<pre><code>                         Title Year Duration Rating Votes
+1               Hababam Sinifi 1975       87    9.2 42500
+2       CM101MMXI Fundamentals 2013      139    9.1 46991
+3                   Tosun Pasa 1976       90    8.9 24321
+4 Hababam Sinifi Sinifta Kaldi 1975       95    8.9 24361
+5                Süt Kardesler 1976       80    8.8 20879</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>Movies<span class="sc">%&gt;%</span><span class="fu">arrange</span>(<span class="fu">desc</span>(Rating))<span class="sc">%&gt;%</span><span class="fu">tail</span>(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                             Title Year Duration Rating Votes
+466                 Cumali Ceber 2 2018      100    1.2 10227
+467                          Müjde 2022      288    1.2  9920
+468              15/07 Safak Vakti 2021       95    1.2 20605
+469 Cumali Ceber: Allah Seni Alsin 2017      100    1.0 39265
+470                           Reis 2017      108    1.0 73971</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Movies<span class="sc">%&gt;%</span><span class="fu">filter</span>(Title<span class="sc">==</span><span class="st">"Kaybedenler Kulübü"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Title Year Duration Rating Votes
+1 Kaybedenler Kulübü 2011      105    7.5 25116</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>Movies<span class="sc">%&gt;%</span><span class="fu">filter</span>(Title<span class="sc">==</span><span class="st">"Anadolu Kartallari"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Title Year Duration Rating Votes
+1 Anadolu Kartallari 2011      120    6.2  5632</code></pre>
 </div>
 </div>
+<p>Actually when we look at movies at the top five, raters likes comedy and laughing. I watched some of them and even though most of them are old films they still make people laugh. These are raters evaluations and we can only rate as they do, everyone has exclusively styles.</p>
+<p>At bottom part we can see political movies. Maybe raters are not interested politic or they don’t believe their content…</p>
+<p>Two of my favorite movies find their position in the list but it is not important. I know some extras from one of these movies. They were good guys.</p>
+<p>Below you can find Turkish movies average ratings for each year</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plot_for_rating<span class="ot">=</span>Movies <span class="sc">%&gt;%</span>  <span class="fu">group_by</span>(Year) <span class="sc">%&gt;%</span> <span class="fu">summarize</span>(<span class="at">average_rating_for_year=</span><span class="fu">mean</span>(Rating))  </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_for_rating,<span class="fu">aes</span>(Year,average_rating_for_year)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="assignment-2_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As shown on plot ratings decrease over years</p>
+<p>Below you can see movies number for each year</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>plot_for_total_movies_for_years<span class="ot">=</span>Movies <span class="sc">%&gt;%</span>  <span class="fu">group_by</span>(Year)   </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_for_total_movies_for_years,<span class="fu">aes</span>(Year)) <span class="sc">+</span> <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>,<span class="at">fill =</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="st">"blue"</span>, <span class="at">col =</span> <span class="st">"black"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="assignment-2_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>p<span class="ot">=</span><span class="fu">as.factor</span>(Movies<span class="sc">$</span>Year)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>Movies<span class="ot">=</span><span class="fu">cbind</span>(Movies,p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Below you can see box plot of ratings over years</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>Movies <span class="sc">%&gt;%</span><span class="fu">ggplot</span>(<span class="fu">aes</span>(p,Rating),)<span class="sc">+</span><span class="fu">geom_boxplot</span>()<span class="sc">+</span><span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>))<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Years"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="assignment-2_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Looking only average of ratings over years may be misleading because of number of movies each year can change. With technological development, number of movies for each year increases and it can be seen easily above. Even though rating average decrease for years, number of movies increase.</p>
+<p>Correlation between votes and rating;</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(Movies,<span class="fu">aes</span>(Votes,Rating))<span class="sc">+</span><span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="assignment-2_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(Votes,Rating)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1306267</code></pre>
+</div>
+</div>
+<p>From plot and result of cor() function we can say there is no explicitly correlation between votes and ratings.</p>
+<p>Correlation between duration and rating;</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(Movies,<span class="fu">aes</span>(Duration,Rating))<span class="sc">+</span><span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="assignment-2_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(Duration,Rating)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.03190838</code></pre>
+</div>
+</div>
+<p>From plot and result of cor() function we can say there is no explicitly correlation between duration and ratings.</p>
+<p>Turkish movies in top 1000 imbd</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr) </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>url_for_turkish_in_top_1000<span class="ot">=</span><span class="st">"https://m.imdb.com/search/title/?title_type=feature&amp;groups=top_1000&amp;country_of_origin=TR"</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>data_for_1000<span class="ot">=</span><span class="fu">read_html</span>(url_for_turkish_in_top_1000)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>names_for_1000 <span class="ot">&lt;-</span> data_for_1000 <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.ipc-title__text'</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>names_for_1000 <span class="ot">&lt;-</span> <span class="fu">html_text</span>(names_for_1000)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>names_for_1000 <span class="ot">&lt;-</span> <span class="fu">tail</span>(<span class="fu">head</span>(names_for_1000,<span class="sc">-</span><span class="dv">1</span>),<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>names_for_1000 <span class="ot">&lt;-</span> <span class="fu">str_split</span>(names_for_1000, <span class="st">" "</span>, <span class="at">n=</span><span class="dv">2</span>)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>names_for_1000 <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">lapply</span>(names_for_1000, <span class="cf">function</span>(x) {x[<span class="dv">2</span>]}))</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>year<span class="ot">=</span>data_for_1000 <span class="sc">|&gt;</span> <span class="fu">html_nodes</span>(<span class="st">'.dli-title-metadata-item:nth-child(1)'</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>year<span class="ot">=</span><span class="fu">html_text</span>(year)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>year<span class="ot">=</span><span class="fu">as.numeric</span>(year)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>movies_in_1000<span class="ot">=</span><span class="fu">data.frame</span>(names_for_1000,year)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>movies_in_1000</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              names_for_1000 year
+1   Yedinci Kogustaki Mucize 2019
+2                 Kis Uykusu 2014
+3      Nefes: Vatan Sagolsun 2009
+4  Ayla: The Daughter of War 2017
+5             Babam ve Oglum 2005
+6                Ahlat Agaci 2018
+7    Bir Zamanlar Anadolu'da 2011
+8                     Eskiya 1996
+9                   G.O.R.A. 2004
+10                 Vizontele 2001
+11  Her Sey Çok Güzel Olacak 1998</code></pre>
+</div>
+</div>
+<p>After joined with first data frame</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>Joined_table <span class="ot">&lt;-</span> <span class="fu">merge</span>(<span class="at">x=</span>movies_in_1000, <span class="at">y=</span>Movies, <span class="at">by.x=</span><span class="fu">c</span>(<span class="st">"names_for_1000"</span>, <span class="st">"year"</span>), <span class="at">by.y=</span><span class="fu">c</span>(<span class="st">"Title"</span>, <span class="st">"Year"</span>), <span class="at">all.x=</span><span class="cn">TRUE</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>Joined_table<span class="sc">%&gt;%</span><span class="fu">arrange</span>(<span class="fu">desc</span>(Rating))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              names_for_1000 year Duration Rating Votes    p
+1  Ayla: The Daughter of War 2017      125    8.3 42972 2017
+2             Babam ve Oglum 2005      108    8.2 91008 2005
+3   Yedinci Kogustaki Mucize 2019      132    8.2 54107 2019
+4                     Eskiya 1996      128    8.1 71688 1996
+5   Her Sey Çok Güzel Olacak 1998      107    8.1 27104 1998
+6                Ahlat Agaci 2018      188    8.0 26961 2018
+7                   G.O.R.A. 2004      127    8.0 66008 2004
+8                 Kis Uykusu 2014      196    8.0 54598 2014
+9      Nefes: Vatan Sagolsun 2009      128    8.0 34986 2009
+10                 Vizontele 2001      110    8.0 38389 2001
+11   Bir Zamanlar Anadolu'da 2011      157    7.8 49320 2011</code></pre>
+</div>
+</div>
+<p>High rated 11 movies in two data frame are same movies but most probably IMDB uses different parameters to determine top 1000 movies. Rating and votes may not be key element to determine top 1000 list.</p>
 
 
 </section>

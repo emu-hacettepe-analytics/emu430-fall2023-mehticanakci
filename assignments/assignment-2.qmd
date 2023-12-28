@@ -4,6 +4,173 @@ title: "Assignment 2"
 
 # Assignment 2
 
+R codes for Turkish movies more then 2500 reviews from <https://m.imdb.com> is as follows. By using these codes you can get a data frame "Movies" with 5 variable "Title, Year, Duration, Rating, Votes" and 469 observations. For 1. and 2. part of assignment 2.
+
 ```{r}
-1 + 1
+library(tidyverse)
+library(rvest)
+library(stringr) 
+library(dplyr)
+library(ggplot2)
+url_after_2010="https://m.imdb.com/search/title/?title_type=feature&release_date=2010-01-01,2023-12-31&sort=moviemeter,asc&num_votes=2500,&country_of_origin=TR&count=250"
+url_before_2010="https://m.imdb.com/search/title/?title_type=feature&release_date=,2009-12-31&sort=moviemeter,asc&num_votes=2500,&country_of_origin=TR&count=250"
+url_vec=c(url_before_2010,url_after_2010)
+Title=c()
+Year=c() 
+Duration=c()
+Rating=c() 
+Votes=c()
+data_for_after_2010_html=read_html(url_vec[1])
+title_names <- data_for_after_2010_html |> html_nodes('.ipc-title__text')
+title_names <- html_text(title_names)
+title_names <- tail(head(title_names,-1),-1)
+title_names <- str_split(title_names, " ", n=2)
+title_names <- unlist(lapply(title_names, function(x) {x[2]}))
+
+title_rating=data_for_after_2010_html |> html_nodes('.ratingGroup--imdb-rating')
+title_rating=html_text(title_rating)
+title_rating=substr(title_rating,1,3)
+title_rating=as.numeric(title_rating)
+
+title_year=data_for_after_2010_html |> html_nodes('.dli-title-metadata-item:nth-child(1)')
+title_year=html_text(title_year)
+title_year=as.numeric(title_year)
+Year=title_year
+
+title_duration=data_for_after_2010_html |> html_nodes('.dli-title-metadata-item:nth-child(2)')
+title_duration=html_text(title_duration)
+title_duration=60*as.numeric(substr(title_duration,1,1))+ifelse(nchar(title_duration)>2,as.integer(substring(title_duration,nchar(title_duration)-2,nchar(title_duration)-1)),0)
+Duration=title_duration
+
+title_votes=data_for_after_2010_html |> html_nodes('.kRnqtn')
+title_votes=html_text(title_votes)
+title_votes=sub(pattern = "Votes", replacement = "", x = title_votes)
+title_votes=sub(pattern = ",", replacement = "", x = title_votes)
+title_votes=as.numeric(title_votes)
+
+data_for_before_2010_html=read_html(url_vec[2])
+title_names_2 <- data_for_before_2010_html |> html_nodes('.ipc-title__text')
+title_names_2 <- html_text(title_names_2)
+title_names_2 <- tail(head(title_names_2,-1),-1)
+title_names_2 <- str_split(title_names_2, " ", n=2)
+title_names_2 <- unlist(lapply(title_names_2, function(x) {x[2]}))
+Title=c(title_names,title_names_2)
+
+title_rating_2=data_for_before_2010_html |> html_nodes('.ratingGroup--imdb-rating')
+title_rating_2=html_text(title_rating_2)
+title_rating_2=substr(title_rating_2,1,3)
+title_rating_2=as.numeric(title_rating_2)
+Rating=c(title_rating,title_rating_2)
+
+title_year_2=data_for_before_2010_html |> html_nodes('.dli-title-metadata-item:nth-child(1)')
+title_year_2=html_text(title_year_2)
+title_year_2=as.numeric(title_year_2)
+Year=c(title_year,title_year_2)
+
+title_duration_2=data_for_before_2010_html |> html_nodes('.dli-title-metadata-item:nth-child(2)')
+title_duration_2=html_text(title_duration_2)
+title_duration_2=60*as.numeric(substr(title_duration_2,1,1))+ifelse(nchar(title_duration_2)>2,as.integer(substring(title_duration_2,nchar(title_duration_2)-2,nchar(title_duration_2)-1)),0)
+Duration=c(title_duration,title_duration_2)
+
+title_votes_2=data_for_before_2010_html |> html_nodes('.kRnqtn')
+title_votes_2=html_text(title_votes_2)
+title_votes_2=sub(pattern = "Votes", replacement = "", x = title_votes_2)
+title_votes_2=sub(pattern = ",", replacement = "", x = title_votes_2)
+title_votes_2=as.numeric(title_votes_2)
+Votes=c(title_votes,title_votes_2)
+Movies=data.frame(Title,Year,Duration,Rating,Votes)
+
 ```
+
+Below you can see top and bottom 5 movies based on user ratings.
+
+```{r}
+Movies%>%arrange(desc(Rating))%>%head(5)
+Movies%>%arrange(desc(Rating))%>%tail(5)
+Movies%>%filter(Title=="Kaybedenler Kulübü")
+Movies%>%filter(Title=="Anadolu Kartallari")
+```
+
+Actually when we look at movies at the top five, raters likes comedy and laughing. I watched some of them and even though most of them are old films they still make people laugh. These are raters evaluations and we can only rate as they do, everyone has exclusively styles.
+
+At bottom part we can see political movies. Maybe raters are not interested politic or they don't believe their content...
+
+Two of my favorite movies find their position in the list but it is not important. I know some extras from one of these movies. They were good guys.
+
+Below you can find Turkish movies average ratings for each year
+
+```{r}
+plot_for_rating=Movies %>%  group_by(Year) %>% summarize(average_rating_for_year=mean(Rating))  
+ggplot(plot_for_rating,aes(Year,average_rating_for_year)) + geom_point()
+```
+
+As shown on plot ratings decrease over years
+
+Below you can see movies number for each year
+
+```{r}
+plot_for_total_movies_for_years=Movies %>%  group_by(Year)   
+ggplot(plot_for_total_movies_for_years,aes(Year)) + geom_histogram(binwidth = 1,fill =
+"blue", col = "black")
+p=as.factor(Movies$Year)
+Movies=cbind(Movies,p)
+```
+
+Below you can see box plot of ratings over years
+
+```{r}
+
+Movies %>%ggplot(aes(p,Rating),)+geom_boxplot()+theme(axis.text.x = element_text(angle = 90, hjust = 1))+xlab("Years")
+```
+
+Looking only average of ratings over years may be misleading because of number of movies each year can change. With technological development, number of movies for each year increases and it can be seen easily above. Even though rating average decrease for years, number of movies increase.
+
+Correlation between votes and rating;
+
+```{r}
+ggplot(Movies,aes(Votes,Rating))+geom_point()
+cor(Votes,Rating)
+```
+
+From plot and result of cor() function we can say there is no explicitly correlation between votes and ratings.
+
+Correlation between duration and rating;
+
+```{r}
+ggplot(Movies,aes(Duration,Rating))+geom_point()
+cor(Duration,Rating)
+```
+
+From plot and result of cor() function we can say there is no explicitly correlation between duration and ratings.
+
+Turkish movies in top 1000 imbd
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(stringr) 
+url_for_turkish_in_top_1000="https://m.imdb.com/search/title/?title_type=feature&groups=top_1000&country_of_origin=TR"
+data_for_1000=read_html(url_for_turkish_in_top_1000)
+names_for_1000 <- data_for_1000 |> html_nodes('.ipc-title__text')
+names_for_1000 <- html_text(names_for_1000)
+names_for_1000 <- tail(head(names_for_1000,-1),-1)
+names_for_1000 <- str_split(names_for_1000, " ", n=2)
+names_for_1000 <- unlist(lapply(names_for_1000, function(x) {x[2]}))
+
+year=data_for_1000 |> html_nodes('.dli-title-metadata-item:nth-child(1)')
+year=html_text(year)
+year=as.numeric(year)
+
+movies_in_1000=data.frame(names_for_1000,year)
+movies_in_1000
+
+```
+
+After joined with first data frame
+
+```{r}
+Joined_table <- merge(x=movies_in_1000, y=Movies, by.x=c("names_for_1000", "year"), by.y=c("Title", "Year"), all.x=TRUE)
+Joined_table%>%arrange(desc(Rating))
+```
+
+High rated 11 movies in two data frame are same movies but most probably IMDB uses different parameters to determine top 1000 movies. Rating and votes may not be key element to determine top 1000 list.
